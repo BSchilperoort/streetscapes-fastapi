@@ -159,6 +159,7 @@ async def set_rating(project_name: str, image_id: int, rating: int | None):
     for img in _images:
         if img.id == image_id:
             img.rating = rating
+            return None
     _unknown_image(image_id, project_name)
 
 
@@ -167,6 +168,7 @@ async def set_tags(project_name: str, image_id: int, tags: tuple[str]):
     for img in _images:
         if img.id == image_id:
             img.tags = tags
+            return None
     _unknown_image(image_id, project_name)
 
 
@@ -175,4 +177,5 @@ async def set_notes(project_name: str, image_id: int, notes: str):
     for img in _images:
         if img.id == image_id:
             img.notes = notes
+            return None
     _unknown_image(image_id, project_name)
