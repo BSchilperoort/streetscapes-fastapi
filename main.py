@@ -25,13 +25,13 @@ class Image:
 
 @dataclass
 class Instance:
-    name: str
-    polygon: str  # geojson string
+    label: str
+    polygon: str  # json multi-polygon string
 
 
 @dataclass
 class Segmentation:
-    name: str
+    model_name: str
     run_args: str
     instances: tuple[Instance]
     notes: str = ""
