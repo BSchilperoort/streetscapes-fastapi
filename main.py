@@ -101,18 +101,8 @@ def _fetch_images(bbox: Bbox) -> list[Image]:
     return [Image(img) for img in _images if _inbounds(img, bbox)]
 
 
-def _fetch_projects() -> list[str]:
-    return ["0",]
-
-
-def _validate_project(project_name: str):
-    if project_name not in _fetch_projects():
-        msg = f"Unknown project '{project_name}'"
-        raise ValueError(msg)
-
-
-def _unknown_image(image_id, project_name):
-    msg = f"No image found with id '{image_id}' in project '{project_name}'"
+def _unknown_image(image_id):
+    msg = f"No image found with id '{image_id}'"
     raise ValueError(msg)
 
 
@@ -121,61 +111,57 @@ async def root():
     return {"message": "Hello World"}
 
 
-@app.get("/projects")
+@app.get("/project")
 async def projects():
-    return _fetch_projects()
+    return "placeholder-project-name"
 
 
-@app.post("/{project_name}/stats")
-async def fetch_stats(project_name: str, bbox: Bbox) -> AggregateStats:
-    _validate_project(project_name)
+@app.post("/stats")
+async def fetch_stats(bbox: Bbox) -> AggregateStats:
     return AggregateStats(
         ["birb"], [], ["wikimedia-commons",], (datetime(2026, 1, 19), datetime(2026, 1, 20))
     )
 
 
-@app.post("/{project_name}/images")
+@app.post("/images")
 async def fetch_images(
-    project_name: str,
     bbox: Bbox,
     filters: Optional[dict[str, Any]] = None
 ) -> list[Image]:
     """Fetch streetscape images corresponding to a bounding box and optionally filters."""
-    _validate_project(project_name)
     return _fetch_images(bbox)
 
 
-@app.post("/{project_name}/images/{image_id}")
-async def fetch_image_metadata(project_name: str, image_id: int):
-    _validate_project(project_name)
+@app.post("/images/{image_id}")
+async def fetch_image_metadata(image_id: int):
     for img in _images:
         if img.id == image_id:
             return img
-    _unknown_image(image_id, project_name)
+    _unknown_image(image_id)
 
 
-@app.post("/{project_name}/images/{image_id}/rating")
-async def set_rating(project_name: str, image_id: int, rating: int | None):
+@app.post("/images/{image_id}/rating")
+async def set_rating(image_id: int, rating: int | None):
     for img in _images:
         if img.id == image_id:
             img.rating = rating
             return None
-    _unknown_image(image_id, project_name)
+    _unknown_image(image_id)
 
 
-@app.post("/{project_name}/images/{image_id}/tags")
-async def set_tags(project_name: str, image_id: int, tags: tuple[str]):
+@app.post("/images/{image_id}/tags")
+async def set_tags(image_id: int, tags: tuple[str]):
     for img in _images:
         if img.id == image_id:
             img.tags = tags
             return None
-    _unknown_image(image_id, project_name)
+    _unknown_image(image_id)
 
 
-@app.post("/{project_name}/images/{image_id}/notes")
-async def set_notes(project_name: str, image_id: int, notes: str):
+@app.post("/images/{image_id}/notes")
+async def set_notes(image_id: int, notes: str):
     for img in _images:
         if img.id == image_id:
             img.notes = notes
             return None
-    _unknown_image(image_id, project_name)
+    _unknown_image(image_id)
